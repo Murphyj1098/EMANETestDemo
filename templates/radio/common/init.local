@@ -1,0 +1,133 @@
+#!/bin/bash -
+
+top_dir=$1
+node_name=$2
+start_time=$3
+
+echo "top_dir: $top_dir"
+echo "node_name: $node_name"
+echo "start_time: $start_time"
+
+cd "$top_dir/$node_name"
+
+# load startup functions
+. ./functions
+
+if [ -f ./node-prestart ]
+then
+    bash ./node-prestart $node_name
+fi
+
+if [ -f platform.xml ] &&
+        [ ! -f NO-emane ]
+then
+    start_emane \
+        $node_name \
+        platform.xml \
+        $top_dir/persist/$node_name/var/log/emane.log \
+        $top_dir/persist/$node_name/var/run/emane.pid \
+        $top_dir/persist/$node_name/var/run/emane.uuid
+fi
+
+if [ -f emane-spectrum-monitor.xml ] &&
+        [ ! -f NO-emane-spectrum-monitor ]
+then
+    start_emane_spectrum_monitor \
+        $node_name \
+        emane-spectrum-monitor.xml \
+        $top_dir/persist/$node_name/var/log/emane-spectrum-monitor.log \
+        $top_dir/persist/$node_name/var/run/emane-spectrum-monitor.pid \
+        $top_dir/persist/$node_name/var/run/emane-spectrum-monitor.uuid
+fi
+
+if [ -f transportdaemon.xml ] &&
+        [ ! -f NO-transportdaemon ]
+then
+    start_emanetransportd \
+        $node_name \
+        transportdaemon.xml \
+        $top_dir/persist/$node_name/var/log/emanetransportd.log \
+        $top_dir/persist/$node_name/var/run/emanetransportd.pid \
+        $top_dir/persist/$node_name/var/run/emanetransportd.uuid
+fi
+
+% if waveform_interface:
+        wait_for_device $node_name ${waveform_interface} 30
+    % else:
+        sleep 4
+    % endif
+
+if [ -f eventdaemon.xml ] &&
+        [ ! -f NO-emaneeventd ]
+then
+    start_emaneeventd_and_wait_for_gpsty \
+        $node_name \
+        eventdaemon.xml \
+        $top_dir/persist/$node_name/var/log/emaneeventd.log \
+        $top_dir/persist/$node_name/var/run/emaneeventd.pid \
+        $top_dir/persist/$node_name/var/run/emaneeventd.uuid \
+        $top_dir/persist/$node_name/var/run/gps.pty
+
+    start_gpsd \
+        $node_name \
+        $top_dir/persist/$node_name/var/run/gps.pty \
+        $top_dir/persist/$node_name/var/run/gpsd.pid
+fi
+
+# OSLR and Batman Config here in template #
+
+if [ -f otestpoint-recorder.xml ] &&
+        [ ! -f NO-otestpoint-recorder ]
+then
+    start_otestpoint_recorder \
+        $node_name \
+        otestpoint-recorder.xml \
+        $top_dir/persist/$node_name/var/log/otestpoint-recorder.log \
+        $top_dir/persist/$node_name/var/run/otestpoint-recorder.pid \
+        $top_dir/persist/$node_name/var/run/otestpoint-recorder.uuid
+fi
+
+if [ -f otestpointd.xml ] &&
+        [ ! -f NO-otestpointd ]
+then
+    start_otestpointd \
+        $node_name \
+        otestpointd.xml \
+        $top_dir/persist/$node_name/var/log/otestpointd.log \
+        $top_dir/persist/$node_name/var/run/otestpointd.pid \
+        $top_dir/persist/$node_name/var/run/otestpointd.uuid \
+fi
+
+if [ -f ./node-preapplication ]
+then
+
+    bash ./node-preapplication $node_name
+fi
+
+if [ -f mgen ] &&
+        [ ! -f NO-mgen ]
+then
+    start_mgen \
+        $node_name \
+        mgen \
+        $top_dir/persist/$node_name/var/log/mgen.out \
+        $top_dir/persist/$node_name/var/run/mgen.pid \
+        $top_dir/persist/$node_name/var/log/mgen.log \
+        "$start_time"
+fi
+
+if [ -f iperf ] &&
+        [ ! -f NO-iperf ]
+then
+    start_iperf \
+        $node_name \
+        iperf \
+        $top_dir/persist/$node_name/var/log/iperf.log \
+        $top_dir/persist/$node_name/var/run/iperf.pid \
+        "$start_time"
+fi
+
+if [ -f ./node-poststart ]
+then
+    bash ./node-poststart $node_name
+fi
