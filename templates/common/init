@@ -38,7 +38,7 @@ for key in context.keys():
        net_devs.add(context[key])
 %>
 
-# jrmurphy: Modify this to use an LXC/letce2 specific version of sshd
+# jrmurphy 9/22: Modify this to use an LXC/letce2 specific version of sshd
 start_sshd()
 {
     local pidfile=$1

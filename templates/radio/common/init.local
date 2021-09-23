@@ -60,7 +60,7 @@ fi
 if [ -f eventdaemon.xml ] &&
         [ ! -f NO-emaneeventd ]
 then
-    start_emaneeventd_and_wait_for_gpsty \
+    start_emaneeventd_and_wait_for_gpspty \
         $node_name \
         eventdaemon.xml \
         $top_dir/persist/$node_name/var/log/emaneeventd.log \

@@ -1,2 +1,15 @@
 #!/bin/bash -
 
+top_dir=$1
+
+# End EMANE Event Service
+if [ -f "$top_dir/persist/host/var/run/emaneeventservice.pid" ]
+    then
+        kill -QUIT $(cat $top_dir/persist/host/var/run/emaneeventservice.pid)
+fi
+
+# End otestpoint-broker
+if [ -f "$top_dir/persist/host/var/run/otestpoint-broker.pid" ]
+    then
+        kill -QUIT $(cat $top_dir/persist/host/var/run/otestpoint-broker.pid)
+fi
