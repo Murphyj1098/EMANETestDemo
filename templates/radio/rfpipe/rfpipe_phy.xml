@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE phy SYSTEM 'file:///usr/share/emane/dtd/phy.dtd'>
-<phy library="rfpipephylayer">
+<phy>
     <param name="bandwidth"                         value="216000000"/>
     <param name="excludesamesubidfromfilterenable"  value="on"/>
     <param name="fading.model"                      value="none"/>
@@ -15,13 +15,13 @@
     <param name="frequencyofinterest"               value="60000000000"/>
     <param name="noisebinsize"                      value="20"/>
     <param name="noisemaxclampenable"               value="off"/>
-    <param name="noiselessmaxmessagepropogation"    value="200000"/>
+    <param name="noisemaxmessagepropagation"	    value="200000"/>
     <param name="noisemaxsegmentduration"           value="1000000"/>
     <param name="noisemaxsegmentoffset"             value="300000"/>
     <param name="noisemode"                         value="none"/>
-    <param name="propogationmodel"                  value="freespace"/>
+    <param name="propagationmodel"                  value="freespace"/>
     <param name="subid"                             value="1"/>
     <param name="systemnoisefigure"                 value="4.000000"/>
-    <param name="timsyncthreshold"                  value="10000"/>
+    <param name="timesyncthreshold"                  value="10000"/>
     <param name="txpower"                           value="0.000000"/>
 </phy>
