@@ -16,191 +16,8 @@ start_emane()
                 --pidfile "$pidfile" --uuidfile "$uuidfile"
 
         retval=$?
-
     else
         echo "$node_name: missing emane XML: $xml [!!]"
-        retval=1
-    fi
-
-    return $retval
-}
-
-start_olsr()
-{
-    local node_name=$1
-    local routingconf=$2
-    local logfile=$3
-
-    echo "$node_name: starting olsr: $routingconf"
-    olsrd -f "$routingconf" &> "$logfile"
-}
-
-start_emaneeventd_and_wait_for_gpspty()
-{
-    local node_name=$1
-    local xml=$2
-    local logfile=$3
-    local pidfile=$4
-    local uuidfile=$5
-    local pty=$6
-
-    if [ -f xml ]; then
-
-        echo "$node_name: starting emaneeventd: $xml"
-
-        rm -f "$pty"
-
-        emaneeventd -r -d "$xml" -l 3 -f "$logfile" \
-                    --pidfile "$pidfile" --uuidfile "$uuidfile"
-
-        retval=$?
-
-        if [[ $retval == 0 ]]; then
-
-            while (! test -f "$pty")
-            do
-                echo "$node_name: Waiting for GPS Location PTY: $pty"
-                sleep 1
-            done
-        fi
-
-    else
-        echo "$node_name: missing emaneeventd XML: $xml [!!]"
-        retval=1
-    fi
-
-    return $retval
-}
-
-start_gpsd()
-{
-    local node_name=$1
-    local pty=$2
-    local pidfile=$3
-    
-    echo "$node_name: starting gpsd: $pty"
-    gpsd -P $pidfile -G -n -b `cat $pty`
-}
-
-wait_for_gpspty()
-{
-    local node_name=$1
-    local pty=$2
-
-    echo "$node_name: waiting for GPS Location PTY: $pty"
-
-    while (! test -f "$pty")
-    do
-        sleep 1
-    done
-
-    echo "$node_name: found GPS Location PTY: $pty"
-
-    return $0
-}
-
-start_emaneeventservice()
-{
-    local node_name=$1
-    local xml=$2
-    local logfile=$3
-    local pidfile=$4
-    local uuidfile=$5
-    local starttime="$6"
-
-    local startoption=""
-
-    if [ -n "$starttime" ]; then
-        startoption="--starttime $(date --date "$starttime" "+%H:%M:%S")"
-    fi
-
-    if [ -f $xml ]; then
-
-        echo "$node_name: starting emaneeventservice: $xml at $starttime"
-
-        emaneeventservice -d "$xml" -l 3 -f "$logfile" \
-                          --pidfile "$pidfile" --uuidfile "$uuidfile" \
-                          $startoption
-
-        retval=$?
-
-    else
-        echo "$node_name: missing emaneeventservice XML: $xml [!!]"
-        retval=1
-    fi
-
-    return $retval
-}
-
-start_otestpointd()
-{
-    local node_name=$1
-    local xml=$2
-    local logfile=$3
-    local pidfile=$4
-    local uuidfile=$5
-
-    if [ -f $xml ]; then
-
-        echo "$node_name: starting otestpointd: $xml"
-
-        otestpointd "$xml" -d -l 3 -f "$logfile" \
-                    --pidfile "$pidfile" --uuidfile "$uuidfile"
-
-        retval=$?
-
-    else
-        echo "$node_name: missing otestpointd XML: $xml [!!]"
-        retval=1
-    fi
-
-    return $retval
-}
-
-start_otestpoint_recorder()
-{
-    local node_name=$1
-    local xml=$2
-    local logfile=$3
-    local pidfile=$4
-    local uuidfile=$5
-
-    if [ -f $xml ]; then
-
-        echo "$node_name: starting otestpoint-recorder: $xml"
-
-        otestpoint-recorder "$xml" -d -l 3 -f "$logfile" \
-                            --pidfile "$pidfile" --uuidfile "$uuidfile"
-
-        retval=$?
-    
-    else
-        echo "$node_name: missing otestpoint-recorder XML: $xml [!!]"
-        retval=1
-    fi
-
-    return $retval
-}
-
-start_otestpoint_broker()
-{
-    local node_name=$1
-    local xml=$2
-    local logfile=$3
-    local pidfile=$4
-    local uuidfile=$5
-
-    if [ -f $xml ]; then
-
-        echo "$node_name: starting otestpoint-broker: $xml"
-
-        otestpoint-broker "$xml" -d -l 3 -f "$logfile" \
-                          --pidfile "$pidfile" --uuidfile "$uuidfile"
-
-        retval=$?
-
-    else
-        echo "$node_name: missing otestpoint-broker XML: $xml [!!]"
         retval=1
     fi
 
@@ -256,6 +73,79 @@ start_mgen()
           txlog &> $logfile &
 
     echo $! > $pidfile
+}
+
+start_otestpointd()
+{
+    local node_name=$1
+    local xml=$2
+    local logfile=$3
+    local pidfile=$4
+    local uuidfile=$5
+
+    if [ -f $xml ]; then
+
+        echo "$node_name: starting otestpointd: $xml"
+
+        otestpointd "$xml" -d -l 3 -f "$logfile" \
+                    --pidfile "$pidfile" --uuidfile "$uuidfile"
+
+        retval=$?
+    else
+        echo "$node_name: missing otestpointd XML: $xml [!!]"
+        retval=1
+    fi
+
+    return $retval
+}
+
+
+start_otestpoint_recorder()
+{
+    local node_name=$1
+    local xml=$2
+    local logfile=$3
+    local pidfile=$4
+    local uuidfile=$5
+
+    if [ -f $xml ]; then
+
+        echo "$node_name: starting otestpoint-recorder: $xml"
+
+        otestpoint-recorder "$xml" -d -l 3 -f "$logfile" \
+                            --pidfile "$pidfile" --uuidfile "$uuidfile"
+
+        retval=$?
+    else
+        echo "$node_name: missing otestpoint-recorder XML: $xml [!!]"
+        retval=1
+    fi
+
+    return $retval
+}
+
+start_otestpoint_broker()
+{
+    local node_name=$1
+    local xml=$2
+    local logfile=$3
+    local pidfile=$4
+    local uuidfile=$5
+
+    if [ -f $xml ]
+    then
+        echo "$node_name: starting otestpoint-broker: $xml"
+
+        otestpoint-broker "$xml" -d -l 3 -f "$logfile" \
+                          --pidfile "$pidfile" --uuidfile "$uuidfile"
+
+        retval=$?
+    else
+        echo "$node_name: missing otestpoint-broker XML: $xml [!!]"
+        retval=1
+    fi
+
+    return $retval
 }
 
 start_iperf()
@@ -368,4 +258,110 @@ load_arp_cache()
     echo "$node_name: load_arp_cache $ethers $device"
 
     arp -i $device -f "$ethers"
+}
+
+start_emaneeventd_and_wait_for_gpspty()
+{
+    local node_name=$1
+    local xml=$2
+    local logfile=$3
+    local pidfile=$4
+    local uuidfile=$5
+    local pty=$6
+
+    if [ -f $xml ]; then
+
+        echo "$node_name: starting emaneeventd: $xml"
+
+        rm -f "$pty"
+
+        emaneeventd -r -d "$xml" -l 3 -f "$logfile" \
+                    --pidfile "$pidfile" --uuidfile "$uuidfile"
+
+        retval=$?
+
+        if [[ $retval == 0 ]]; then
+
+
+            while (! test -f "$pty")
+            do
+                echo "$node_name: Waiting for GPS Locatopn PTY: $pty"
+                sleep 1
+            done
+        fi
+
+    else
+        echo "$node_name: missing emaneeventd XML: $xml [!!]"
+        retval=1
+    fi
+
+    return $retval
+}
+
+start_gpsd()
+{
+    local node_name=$1
+    local pty=$2
+    local pidfile=$3
+
+    echo "$node_name: starting gpsd: $pty"
+    gpsd -P $pidfile -G -n -b `cat $pty`
+}
+
+wait_for_gpspty()
+{
+    local node_name=$1
+    local pty=$2
+
+    echo "$node_name: waiting for GPS Locatopn PTY: $pty"
+
+    while (! test -f "$pty")
+    do
+        sleep 1
+    done
+    echo "$node_name: found GPS Locatopn PTY: $pty"
+    return $0
+}
+
+start_emaneeventservice()
+{
+    local node_name=$1
+    local xml=$2
+    local logfile=$3
+    local pidfile=$4
+    local uuidfile=$5
+    local starttime="$6"
+
+    local startoption=""
+
+    if [ -n "$starttime" ]; then
+        startoption="--starttime $(date --date "$starttime" "+%H:%M:%S")"
+    fi
+
+    if [ -f $xml ]
+    then
+        echo "$node_name: starting emaneeventservice: $xml at $starttime"
+
+        emaneeventservice -d "$xml" -l 3 -f "$logfile" \
+                          --pidfile "$pidfile" --uuidfile "$uuidfile" \
+                          $startoption
+
+        retval=$?
+    else
+
+        echo "$node_name: missing emaneeventservice XML: $xml [!!]"
+
+        retval=1
+    fi
+
+    return $retval
+}
+
+start_olsr()
+{
+    local node_name=$1
+    local routingconf=$2
+    local logfile=$3
+    echo "$node_name: starting olsr: $routingconf"
+    olsrd -f "$routingconf" &> "$logfile"
 }

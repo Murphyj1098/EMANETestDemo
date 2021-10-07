@@ -74,7 +74,24 @@ then
         $top_dir/persist/$node_name/var/run/gpsd.pid
 fi
 
-# OSLR and Batman Config here in template #
+if [ -f olsr.conf ] &&
+        [ ! -f NO-olsr ]
+then
+    start_olsr \
+        $node_name \
+        olsr.conf \
+        $top_dir/persist/$node_name/var/log/olsr.log
+
+    wait_for_device $node_name bmf0 30
+fi
+
+if [ -f batman-adv ] &&
+        [ ! -f NO-batman-adv ]
+then
+    bash ./batman-adv $node_name
+
+    wait_for_device $node_name ${batman_interface} 30
+fi
 
 if [ -f otestpoint-recorder.xml ] &&
         [ ! -f NO-otestpoint-recorder ]
