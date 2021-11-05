@@ -22,6 +22,6 @@
     <param name="propagationmodel"                  value="freespace"/>
     <param name="subid"                             value="1"/>
     <param name="systemnoisefigure"                 value="4.000000"/>
-    <param name="timesyncthreshold"                  value="10000"/>
+    <param name="timesyncthreshold"                 value="10000"/>
     <param name="txpower"                           value="0.000000"/>
 </phy>
