@@ -1,5 +1,8 @@
-/exp
-!/exp/experiment.cfg
-!/exp/letce2.cfg
-!/exp/Makefile
-!/exp/batman-routes
+# Ignore everything in experiment directory (generated files)
+exp/*
+
+# Except do not ignore persistent files (including in sub-directories)
+!exp/experiment.cfg
+!exp/letce2.cfg
+!exp/Makefile
+!exp/batman-routes
